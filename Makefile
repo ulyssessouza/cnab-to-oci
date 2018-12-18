@@ -1,7 +1,7 @@
 all: binary test
 
 binary:
-	go build github.com/docker/cnab-to-oci/cmd/cnab-to-oci
+	go build -o bin/cnab-to-oci github.com/docker/cnab-to-oci/cmd/cnab-to-oci
 
 .PHONY: test
 test:
