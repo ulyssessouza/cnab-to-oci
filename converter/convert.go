@@ -1,4 +1,4 @@
-package oci
+package converter
 
 import (
 	_ "crypto/sha256" // this ensures we can parse sha256 digests
@@ -24,9 +24,9 @@ const (
 	DockerAppFormatAnnotation = "io.docker.app.format"
 	// DockerAppFormatCNAB is the DockerAppFormatAnnotation value for CNAB
 	DockerAppFormatCNAB = "cnab"
-	// DockerTypeAnnotion
+	// DockerTypeAnnotation TODO(ulyssessouza) add comment
 	DockerTypeAnnotation = "io.docker.type"
-	// DockerTypeApp
+	// DockerTypeApp TODO(ulyssessouza) add comment
 	DockerTypeApp = "app"
 	// CNABRuntimeVersionAnnotation is the top level annotation specifying the CNAB runtime version
 	CNABRuntimeVersionAnnotation = "io.cnab.runtime_version"
@@ -78,6 +78,23 @@ func ConvertBundleToOCIIndex(b *bundle.Bundle, targetReference reference.Named, 
 		Manifests:   manifests,
 	}
 	return &result, nil
+}
+
+// ConvertOCIIndexToBundle converts an OCI index to a cnab bundle representation
+// TODO: details
+func ConvertOCIIndexToBundle(ix *ocischemav1.Index, config *BundleConfig, originRepo reference.Named) (*bundle.Bundle, error) {
+	b := &bundle.Bundle{
+		Actions:     config.Actions,
+		Credentials: config.Credentials,
+		Parameters:  config.Parameters,
+	}
+	if err := parseTopLevelAnnotations(ix.Annotations, b); err != nil {
+		return nil, err
+	}
+	if err := parseManifests(ix.Manifests, b, originRepo); err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 func makeAnnotations(b *bundle.Bundle) (map[string]string, error) {
@@ -250,21 +267,4 @@ func makeDescriptor(baseImage bundle.BaseImage, targetReference reference.Named)
 		MediaType: baseImage.MediaType,
 		Size:      int64(baseImage.Size),
 	}, nil
-}
-
-// ConvertOCIIndexToBundle converts an OCI index to a cnab bundle representation
-// TODO: details
-func ConvertOCIIndexToBundle(ix *ocischemav1.Index, config *BundleConfig, originRepo reference.Named) (*bundle.Bundle, error) {
-	b := &bundle.Bundle{
-		Actions:     config.Actions,
-		Credentials: config.Credentials,
-		Parameters:  config.Parameters,
-	}
-	if err := parseTopLevelAnnotations(ix.Annotations, b); err != nil {
-		return nil, err
-	}
-	if err := parseManifests(ix.Manifests, b, originRepo); err != nil {
-		return nil, err
-	}
-	return b, nil
 }

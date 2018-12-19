@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/docker/cli/opts"
+
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/remotes/docker"
 	"github.com/deislabs/duffle/pkg/bundle"
@@ -58,7 +60,7 @@ func fixupImage(ctx context.Context, baseImage bundle.BaseImage, ref reference.N
 	}
 	var handler imageHandler = &copier
 	if reference.Domain(imageRef) == reference.Domain(ref) {
-		mounter, err := newImageMounter(ctx, resolver, copier, sourceFetcher, sourceRepoOnly.Name(), repoOnly.Name())
+		mounter, err := newImageMounter(ctx, resolver, copier, sourceRepoOnly.Name(), repoOnly.Name())
 		if err != nil {
 			return bundle.BaseImage{}, err
 		}
@@ -79,32 +81,35 @@ func fixupImage(ctx context.Context, baseImage bundle.BaseImage, ref reference.N
 	return baseImage, nil
 }
 
-func fixupBaseImage(ctx context.Context, baseImage *bundle.BaseImage, ref reference.Named, resolver docker.ResolverBlobMounter) (repoOnly reference.Named, imageRef reference.Named, descriptor ocischemav1.Descriptor, err error) {
+func fixupBaseImage(ctx context.Context,
+	baseImage *bundle.BaseImage,
+	ref opts.NamedOption,
+	resolver docker.ResolverBlobMounter) (repoOnly reference.Named, imageRef reference.Named, descriptor ocischemav1.Descriptor, err error) {
 	var e error
 	if e = checkBaseImage(baseImage); e != nil {
 		err = fmt.Errorf("invalid image %q: %s", ref, e)
-		return
+		return nil, nil, descriptor, err
 	}
 	if repoOnly, err = reference.ParseNormalizedNamed(ref.Name()); err != nil {
-		return
+		return nil, nil, descriptor, err
 	}
 	if imageRef, e = reference.ParseNormalizedNamed(baseImage.Image); e != nil {
 		err = fmt.Errorf("%q is not a valid image reference for %q", baseImage.Image, ref)
-		return
+		return nil, nil, descriptor, err
 	}
 	imageRef = reference.TagNameOnly(imageRef)
 	if _, descriptor, e = resolver.Resolve(ctx, imageRef.String()); e != nil {
 		err = fmt.Errorf("failed to resolve %q: %s", imageRef, err)
-		return
+		return nil, nil, descriptor, err
 	}
 	digested, e := reference.WithDigest(repoOnly, descriptor.Digest)
 	if e != nil {
-		return
+		return nil, nil, descriptor, e
 	}
 	baseImage.Image = reference.FamiliarString(digested)
 	baseImage.MediaType = descriptor.MediaType
 	baseImage.Size = uint64(descriptor.Size)
-	return
+	return repoOnly, imageRef, descriptor, e
 }
 
 func checkBaseImage(baseImage *bundle.BaseImage) error {

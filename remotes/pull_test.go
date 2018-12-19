@@ -6,15 +6,16 @@ import (
 	"encoding/json"
 	"testing"
 
-	oci "github.com/docker/cnab-to-oci"
-	"github.com/docker/cnab-to-oci/test"
+	"github.com/docker/cnab-to-oci/converter"
+
+	"github.com/docker/cnab-to-oci/tests"
 	"github.com/docker/distribution/reference"
 	ocischemav1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"gotest.tools/assert"
 )
 
 func TestPull(t *testing.T) {
-	index := test.MakeTestOCIIndex()
+	index := tests.MakeTestOCIIndex()
 	bufBundleManifest, err := json.Marshal(index)
 	assert.NilError(t, err)
 
@@ -29,7 +30,7 @@ func TestPull(t *testing.T) {
    "layers": null
 }`)
 
-	config := oci.CreateBundleConfig(test.MakeTestBundle())
+	config := converter.CreateBundleConfig(tests.MakeTestBundle())
 	bufBundleConfig, err := json.Marshal(config)
 	assert.NilError(t, err)
 
@@ -45,14 +46,14 @@ func TestPull(t *testing.T) {
 		fetcher: fetcher,
 		resolvedDescriptors: []ocischemav1.Descriptor{
 			// Bundle index descriptor
-			ocischemav1.Descriptor{MediaType: ocischemav1.MediaTypeImageIndex},
+			{MediaType: ocischemav1.MediaTypeImageIndex},
 			// Bundle config manifest descriptor
-			ocischemav1.Descriptor{
+			{
 				MediaType: ocischemav1.MediaTypeDescriptor,
 				Digest:    "sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 			},
 			// Bundle config descriptor
-			ocischemav1.Descriptor{MediaType: ocischemav1.MediaTypeImageIndex},
+			{MediaType: ocischemav1.MediaTypeImageIndex},
 		},
 	}
 	ref, err := reference.ParseNamed("my.registry/namespace/my-app:my-tag")
@@ -61,6 +62,6 @@ func TestPull(t *testing.T) {
 	// Pull the CNAB and get the bundle
 	b, err := Pull(context.Background(), ref, resolver)
 	assert.NilError(t, err)
-	expectedBundle := test.MakeTestBundle()
+	expectedBundle := tests.MakeTestBundle()
 	assert.DeepEqual(t, expectedBundle, b)
 }

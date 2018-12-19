@@ -1,8 +1,9 @@
 package remotes
 
 import (
-	"gotest.tools/assert"
 	"testing"
+
+	"gotest.tools/assert"
 )
 
 type twoStepReader struct {

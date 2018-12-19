@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/cnab-to-oci/test"
+	"github.com/docker/cnab-to-oci/tests"
 	"github.com/docker/distribution/manifest/schema2"
 	"github.com/docker/distribution/reference"
 	ocischemav1 "github.com/opencontainers/image-spec/specs-go/v1"
@@ -91,7 +91,7 @@ const (
 func TestPush(t *testing.T) {
 	pusher := &mockPusher{}
 	resolver := &mockResolver{pusher: pusher}
-	b := test.MakeTestBundle()
+	b := tests.MakeTestBundle()
 	ref, err := reference.ParseNamed("my.registry/namespace/my-app:my-tag")
 	assert.NilError(t, err)
 

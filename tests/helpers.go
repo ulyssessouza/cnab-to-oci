@@ -1,4 +1,4 @@
-package test
+package tests
 
 import (
 	"github.com/deislabs/duffle/pkg/bundle"
@@ -11,19 +11,19 @@ import (
 func MakeTestBundle() *bundle.Bundle {
 	return &bundle.Bundle{
 		Actions: map[string]bundle.Action{
-			"action-1": bundle.Action{
+			"action-1": {
 				Modifies: true,
 			},
 		},
 		Credentials: map[string]bundle.Location{
-			"cred-1": bundle.Location{
+			"cred-1": {
 				EnvironmentVariable: "env-var",
 				Path:                "/some/path",
 			},
 		},
 		Description: "description",
 		Images: map[string]bundle.Image{
-			"image-1": bundle.Image{
+			"image-1": {
 				Description: "nginx:2.12",
 				BaseImage: bundle.BaseImage{
 					Image:     "my.registry/namespace/my-app@sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
@@ -34,7 +34,7 @@ func MakeTestBundle() *bundle.Bundle {
 			},
 		},
 		InvocationImages: []bundle.InvocationImage{
-			bundle.InvocationImage{
+			{
 				BaseImage: bundle.BaseImage{
 					Image:     "my.registry/namespace/my-app@sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 					ImageType: "docker",
@@ -45,7 +45,7 @@ func MakeTestBundle() *bundle.Bundle {
 		},
 		Keywords: []string{"keyword1", "keyword2"},
 		Maintainers: []bundle.Maintainer{
-			bundle.Maintainer{
+			{
 				Email: "docker@docker.com",
 				Name:  "docker",
 				URL:   "docker.com",
@@ -53,7 +53,7 @@ func MakeTestBundle() *bundle.Bundle {
 		},
 		Name: "my-app",
 		Parameters: map[string]bundle.ParameterDefinition{
-			"param1": bundle.ParameterDefinition{
+			"param1": {
 				AllowedValues: []interface{}{"value1", true, float64(1)},
 				DataType:      "type",
 				DefaultValue:  "hello",
@@ -67,6 +67,7 @@ func MakeTestBundle() *bundle.Bundle {
 	}
 }
 
+// MakeTestOCIIndex TODO(ulyssessouza) Add comment
 func MakeTestOCIIndex() *ocischemav1.Index {
 	return &ocischemav1.Index{
 		Versioned: ocischema.Versioned{
@@ -83,7 +84,7 @@ func MakeTestOCIIndex() *ocischemav1.Index {
 			"io.docker.type":                  "app",
 		},
 		Manifests: []ocischemav1.Descriptor{
-			ocischemav1.Descriptor{
+			{
 				Digest:    "sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 				MediaType: schema2.MediaTypeManifest,
 				Size:      250,
@@ -91,7 +92,7 @@ func MakeTestOCIIndex() *ocischemav1.Index {
 					"io.cnab.type": "config",
 				},
 			},
-			ocischemav1.Descriptor{
+			{
 				Digest:    "sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 				MediaType: "application/vnd.docker.distribution.manifest.v2+json",
 				Size:      250,
@@ -99,7 +100,7 @@ func MakeTestOCIIndex() *ocischemav1.Index {
 					"io.cnab.type": "invocation",
 				},
 			},
-			ocischemav1.Descriptor{
+			{
 				Digest:    "sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 				MediaType: "application/vnd.oci.image.manifest.v1+json",
 				Size:      250,

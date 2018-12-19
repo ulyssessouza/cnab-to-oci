@@ -1,4 +1,4 @@
-package oci
+package converter
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	ocischemav1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
-// BundleConfig discribes a cnab bundle runtime config
+// BundleConfig describes a cnab bundle runtime config
 type BundleConfig struct {
 	SchemaVersion string                                `json:"schema_version" mapstructure:"schema_version"`
 	Actions       map[string]bundle.Action              `json:"actions,omitempty" mapstructure:"actions,omitempty"`
