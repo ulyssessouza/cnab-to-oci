@@ -143,6 +143,7 @@ func ExamplePush() {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Printf("%s", string(bytes))
 
 	// Output:

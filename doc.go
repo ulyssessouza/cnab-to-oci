@@ -5,9 +5,9 @@
 // It can also be used as a library. For more, please refer to http://godoc.org/github.com/docker/cnab-to-oci
 // The main functions are located in the remotes package, and they are:
 //
-// [remotes.Push](https://github.com/docker/cnab-to-oci/blob/master/remotes/push.go)
+// remotes.Pull in https://github.com/docker/cnab-to-oci/blob/master/remotes/pull.go
 //
-// [remotes.Pull](https://github.com/docker/cnab-to-oci/blob/master/remotes/pull.go)
+// remotes.Push in https://github.com/docker/cnab-to-oci/blob/master/remotes/push.go
 //
-// [remotes.Fixup](https://github.com/docker/cnab-to-oci/blob/master/remotes/fixup.go)
+// remotes.Fixup in https://github.com/docker/cnab-to-oci/blob/master/remotes/fixup.go
 package cnabtooci
