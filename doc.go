@@ -2,7 +2,7 @@
 // In `cmd/cnab-to-oci` you can find the `main` package to create the `cnab-to-oci` binary
 // see https://github.com/docker/cnab-to-oci for more information about it.
 //
-// It can also be used as a library. For more, please refer to http://godoc.org/docker/cnab-to-oci
+// It can also be used as a library. For more, please refer to http://godoc.org/github.com/docker/cnab-to-oci
 // The main functions are located in the remotes package, and they are:
 //
 // remotes.Push
