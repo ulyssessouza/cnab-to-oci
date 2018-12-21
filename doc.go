@@ -6,6 +6,8 @@
 // The main functions are located in the remotes package, and they are:
 //
 // remotes.Push
+//
 // remotes.Pull
+//
 // remotes.Fixup
 package cnabtooci
