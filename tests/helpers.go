@@ -29,7 +29,7 @@ func MakeTestBundle() *bundle.Bundle {
 					Image:     "my.registry/namespace/my-app@sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 					ImageType: "oci",
 					MediaType: "application/vnd.oci.image.manifest.v1+json",
-					Size:      250,
+					Size:      507,
 				},
 			},
 		},
@@ -39,7 +39,7 @@ func MakeTestBundle() *bundle.Bundle {
 					Image:     "my.registry/namespace/my-app@sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 					ImageType: "docker",
 					MediaType: "application/vnd.docker.distribution.manifest.v2+json",
-					Size:      250,
+					Size:      506,
 				},
 			},
 		},
@@ -67,7 +67,7 @@ func MakeTestBundle() *bundle.Bundle {
 	}
 }
 
-// MakeTestOCIIndex TODO(ulyssessouza) Add comment
+// MakeTestOCIIndex creates a dummy OCI index for tests
 func MakeTestOCIIndex() *ocischemav1.Index {
 	return &ocischemav1.Index{
 		Versioned: ocischema.Versioned{
@@ -87,7 +87,7 @@ func MakeTestOCIIndex() *ocischemav1.Index {
 			{
 				Digest:    "sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 				MediaType: schema2.MediaTypeManifest,
-				Size:      250,
+				Size:      315,
 				Annotations: map[string]string{
 					"io.cnab.type": "config",
 				},
@@ -95,7 +95,7 @@ func MakeTestOCIIndex() *ocischemav1.Index {
 			{
 				Digest:    "sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 				MediaType: "application/vnd.docker.distribution.manifest.v2+json",
-				Size:      250,
+				Size:      506,
 				Annotations: map[string]string{
 					"io.cnab.type": "invocation",
 				},
@@ -103,7 +103,7 @@ func MakeTestOCIIndex() *ocischemav1.Index {
 			{
 				Digest:    "sha256:d59a1aa7866258751a261bae525a1842c7ff0662d4f34a355d5f36826abc0341",
 				MediaType: "application/vnd.oci.image.manifest.v1+json",
-				Size:      250,
+				Size:      507,
 				Annotations: map[string]string{
 					"io.cnab.type":           "component",
 					"io.cnab.component_name": "image-1",

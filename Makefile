@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := all
 
+SHELL:=/bin/bash
+
 all: build test
 
 all-ci: lint all
@@ -10,6 +12,9 @@ get-tools:
 
 build:
 	go build -o bin/cnab-to-oci ./cmd/cnab-to-oci
+
+install:
+	pushd cmd/cnab-to-oci && go install && popd
 
 clean:
 	rm -rf bin
