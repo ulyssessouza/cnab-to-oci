@@ -108,7 +108,7 @@ func TestGetConfigDescriptor(t *testing.T) {
 				MediaType: schema2.MediaTypeManifest,
 				Size:      315,
 				Annotations: map[string]string{
-					CNABDescriptorTypeAnnotation: CNABDescriptorTypeConfig.String(),
+					CNABDescriptorTypeAnnotation: CNABDescriptorTypeConfig,
 				},
 			},
 			{
@@ -136,7 +136,7 @@ func TestGetConfigDescriptor(t *testing.T) {
 		MediaType: schema2.MediaTypeManifest,
 		Size:      315,
 		Annotations: map[string]string{
-			CNABDescriptorTypeAnnotation: CNABDescriptorTypeConfig.String(),
+			CNABDescriptorTypeAnnotation: CNABDescriptorTypeConfig,
 		},
 	}
 	d, err := GetBundleConfigManifestDescriptor(ix)

@@ -21,16 +21,23 @@ const ( // General values
 	OCIIndexSchemaVersion = 1
 )
 
-const ( // Top Level annotations
+// Type aliases to clarify to which annotation the values belong
+type dockerAppFormatValue = string
+
+type dockerTypeValue = string
+
+type cnabDescriptorTypeValue = string
+
+const ( // Top Level annotations and values
 	// DockerAppFormatAnnotation is the top level annotation specifying the kind of the App Bundle
 	DockerAppFormatAnnotation = "io.docker.app.format"
 	// DockerAppFormatCNAB is the DockerAppFormatAnnotation value for CNAB
-	DockerAppFormatCNAB enumValue = "cnab"
+	DockerAppFormatCNAB dockerAppFormatValue = "cnab"
 
 	// DockerTypeAnnotation is the annotation that designates the type of the application
 	DockerTypeAnnotation = "io.docker.type"
 	// DockerTypeApp is the value used to fill DockerTypeAnnotation when targeting a docker-app
-	DockerTypeApp enumValue = "app"
+	DockerTypeApp dockerTypeValue = "app"
 
 	// CNABRuntimeVersionAnnotation is the top level annotation specifying the CNAB runtime version
 	CNABRuntimeVersionAnnotation = "io.cnab.runtime_version"
@@ -38,15 +45,15 @@ const ( // Top Level annotations
 	CNABKeywordsAnnotation = "io.cnab.keywords"
 )
 
-const ( // Descriptor level annotations
+const ( // Descriptor level annotations and values
 	// CNABDescriptorTypeAnnotation is a descriptor-level annotation specifying the type of reference image (currently invocation or component)
 	CNABDescriptorTypeAnnotation = "io.cnab.type"
 	// CNABDescriptorTypeInvocation is the CNABDescriptorTypeAnnotation value for invocation images
-	CNABDescriptorTypeInvocation enumValue = "invocation"
+	CNABDescriptorTypeInvocation cnabDescriptorTypeValue = "invocation"
 	// CNABDescriptorTypeComponent is the CNABDescriptorTypeAnnotation value for component images
-	CNABDescriptorTypeComponent enumValue = "component"
+	CNABDescriptorTypeComponent cnabDescriptorTypeValue = "component"
 	// CNABDescriptorTypeConfig is the CNABDescriptorTypeAnnotation value for bundle configuration
-	CNABDescriptorTypeConfig enumValue = "config"
+	CNABDescriptorTypeConfig cnabDescriptorTypeValue = "config"
 
 	// CNABDescriptorComponentNameAnnotation is a decriptor-level annotation specifying the component name
 	CNABDescriptorComponentNameAnnotation = "io.cnab.component_name"
@@ -58,7 +65,7 @@ const ( // Descriptor level annotations
 // GetBundleConfigManifestDescriptor returns the CNAB runtime config manifest descriptor from a OCI index
 func GetBundleConfigManifestDescriptor(ix *ocischemav1.Index) (ocischemav1.Descriptor, error) {
 	for _, d := range ix.Manifests {
-		if d.Annotations[CNABDescriptorTypeAnnotation] == CNABDescriptorTypeConfig.String() {
+		if d.Annotations[CNABDescriptorTypeAnnotation] == CNABDescriptorTypeConfig {
 			return d, nil
 		}
 	}
@@ -103,12 +110,12 @@ func ConvertOCIIndexToBundle(ix *ocischemav1.Index, config *BundleConfig, origin
 
 func makeAnnotations(b *bundle.Bundle) (map[string]string, error) {
 	result := map[string]string{
-		DockerAppFormatAnnotation:         DockerAppFormatCNAB.String(),
+		DockerAppFormatAnnotation:         DockerAppFormatCNAB,
 		CNABRuntimeVersionAnnotation:      CNABVersion,
 		ocischemav1.AnnotationTitle:       b.Name,
 		ocischemav1.AnnotationVersion:     b.Version,
 		ocischemav1.AnnotationDescription: b.Description,
-		DockerTypeAnnotation:              DockerTypeApp.String(),
+		DockerTypeAnnotation:              DockerTypeApp,
 	}
 	if b.Maintainers != nil {
 		maintainers, err := json.Marshal(b.Maintainers)
@@ -156,14 +163,14 @@ func makeManifests(b *bundle.Bundle, targetReference reference.Named, bundleConf
 	if bundleConfigManifestReference.Annotations == nil {
 		bundleConfigManifestReference.Annotations = map[string]string{}
 	}
-	bundleConfigManifestReference.Annotations[CNABDescriptorTypeAnnotation] = CNABDescriptorTypeConfig.String()
+	bundleConfigManifestReference.Annotations[CNABDescriptorTypeAnnotation] = CNABDescriptorTypeConfig
 	manifests := []ocischemav1.Descriptor{bundleConfigManifestReference}
 	invocationImage, err := makeDescriptor(b.InvocationImages[0].BaseImage, targetReference)
 	if err != nil {
 		return nil, fmt.Errorf("invalid invocation image: %s", err)
 	}
 	invocationImage.Annotations = map[string]string{
-		CNABDescriptorTypeAnnotation: CNABDescriptorTypeInvocation.String(),
+		CNABDescriptorTypeAnnotation: CNABDescriptorTypeInvocation,
 	}
 	manifests = append(manifests, invocationImage)
 	for name, img := range b.Images {
@@ -172,7 +179,7 @@ func makeManifests(b *bundle.Bundle, targetReference reference.Named, bundleConf
 			return nil, fmt.Errorf("invalid image: %s", err)
 		}
 		image.Annotations = map[string]string{
-			CNABDescriptorTypeAnnotation:          CNABDescriptorTypeComponent.String(),
+			CNABDescriptorTypeAnnotation:          CNABDescriptorTypeComponent,
 			CNABDescriptorComponentNameAnnotation: name,
 			CNABDescriptorOriginalNameAnnotation:  img.Description,
 		}
@@ -196,7 +203,7 @@ func parseManifests(descriptors []ocischemav1.Descriptor, into *bundle.Bundle, o
 		if !ok {
 			return fmt.Errorf("manifest descriptor %q has no CNAB descriptor type annotation %q", d.Digest, CNABDescriptorTypeAnnotation)
 		}
-		if descriptorType == CNABDescriptorTypeConfig.String() {
+		if descriptorType == CNABDescriptorTypeConfig {
 			continue
 		}
 		// strip tag/digest from originRepo
@@ -211,7 +218,7 @@ func parseManifests(descriptors []ocischemav1.Descriptor, into *bundle.Bundle, o
 		refFamiliar := reference.FamiliarString(ref)
 		switch descriptorType {
 		// The current descriptor is an invocation image
-		case CNABDescriptorTypeInvocation.String():
+		case CNABDescriptorTypeInvocation:
 			into.InvocationImages = append(into.InvocationImages, bundle.InvocationImage{
 				BaseImage: bundle.BaseImage{
 					Image:     refFamiliar,
@@ -221,7 +228,7 @@ func parseManifests(descriptors []ocischemav1.Descriptor, into *bundle.Bundle, o
 				},
 			})
 		// The current descriptor is a component image
-		case CNABDescriptorTypeComponent.String():
+		case CNABDescriptorTypeComponent:
 			componentName, ok := d.Annotations[CNABDescriptorComponentNameAnnotation]
 			if !ok {
 				return fmt.Errorf("component name missing in descriptor %q", d.Digest)
@@ -271,11 +278,4 @@ func makeDescriptor(baseImage bundle.BaseImage, targetReference reference.Named)
 		MediaType: baseImage.MediaType,
 		Size:      int64(baseImage.Size),
 	}, nil
-}
-
-// This type is there just to differentiate the values from the keys
-type enumValue string
-
-func (t enumValue) String() string {
-	return string(t)
 }
